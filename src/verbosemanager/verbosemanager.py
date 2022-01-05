@@ -29,6 +29,7 @@ class VerboseManager:
         self.times = False
         self.bar = False
         self.step_times = False
+        self.step_time = time()
         self._in_progress = False
         self.subprocesses = 0
         self.timings_list = []
@@ -191,7 +192,9 @@ class VerboseManager:
         prev_message_len = len(self.prev_message)
         if self.step_times:
             # account for "; previous step took x.xx seconds." added
-            prev_message_len += 34
+            # and don't account for it at initialisation step
+            if self.progress != 0:
+                prev_message_len += 34
         eraser_diff = prev_message_len - len(message)
         if eraser_diff <= 0:
             eraser_diff = 0
