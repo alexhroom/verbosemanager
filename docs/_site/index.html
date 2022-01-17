@@ -39,7 +39,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="verbosemanager" />
 <script type="application/ld+json">
-{"@type":"WebSite","url":"http://localhost:4000/","author":{"@type":"Person","name":"andrew-park"},"headline":"verbosemanager","description":"verbose management of complex processes","name":"verbosemanager","@context":"https://schema.org"}</script>
+{"@type":"WebSite","headline":"verbosemanager","url":"http://localhost:4000/","author":{"@type":"Person","name":"andrew-park"},"description":"verbose management of complex processes","name":"verbosemanager","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="verbosemanager" /></head>
   <body class="d-flex flex-column h-100">
@@ -124,17 +124,17 @@
 </code></pre></div>    </div>
     <p>(where the verbose_manager.start parameters are the number of steps between the start &amp; finish and the verbosity level)</p>
   </li>
-  <li>You’re done! verbosemanager will automatically include the subprocess step in your full process (as long as you account for it in the steps parameter of verbose_manager.start) and users will see something like this after your function finishes:
-    <div class="language-erlang highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="o">===============</span><span class="p">]</span> <span class="mi">100</span><span class="c">% Complete
-</span><span class="nv">Process</span> <span class="n">completed</span> <span class="n">in</span> <span class="p">[</span><span class="n">time</span><span class="p">]</span> <span class="n">seconds</span><span class="p">.</span>
-<span class="nv">Timings</span> <span class="n">per</span> <span class="nn">step</span><span class="p">:</span>
-<span class="nv">Initialisation</span><span class="p">:</span> <span class="p">[</span><span class="n">time</span><span class="p">]</span>
-<span class="nv">Step</span> <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="n">time</span><span class="p">]</span>
-<span class="p">|</span><span class="nv">Subprocess</span> <span class="nn">step</span><span class="p">:</span> <span class="p">[</span><span class="n">time</span><span class="p">]</span>
-<span class="nv">Step</span> <span class="mi">2</span><span class="p">:</span> <span class="p">[</span><span class="n">time</span><span class="p">]</span>
-</code></pre></div>    </div>
-  </li>
+  <li>You’re done! verbosemanager will automatically include the subprocess step in your full process (as long as you account for it in the steps parameter of verbose_manager.start) and users will see something like this after your function finishes:</li>
 </ol>
+
+<pre><code class="language-ansiwhite">[===============] 100% Complete
+Process completed in [time] seconds.
+Timings per step:
+Initialisation: [time]
+Step 1: [time]
+|Subprocess step: [time]
+Step 2: [time]
+</code></pre>
 
 </div>
     </div>

@@ -59,7 +59,8 @@ def process(verbose):
 (where the verbose_manager.start parameters are the number of steps between the start & finish and the verbosity level)
 
 6. You're done! verbosemanager will automatically include the subprocess step in your full process (as long as you account for it in the steps parameter of verbose_manager.start) and users will see something like this after your function finishes:
-```erlang
+
+```ansiwhite
 [===============] 100% Complete
 Process completed in [time] seconds.
 Timings per step:
