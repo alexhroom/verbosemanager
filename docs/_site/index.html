@@ -86,11 +86,11 @@
     <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pip3</span> <span class="n">install</span> <span class="n">verbosemanager</span>
 </code></pre></div>    </div>
   </li>
-  <li>Import the VerboseManager class into your python script file:
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">verbosemanager</span> <span class="kn">import</span> <span class="n">VerboseManager</span>
+  <li>Import the <code class="language-plaintext highlighter-rouge">VerboseManager</code> class and <code class="language-plaintext highlighter-rouge">@verbosemanager</code> decorator into your python script file:
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">verbosemanager</span> <span class="kn">import</span> <span class="n">verbosemanager</span><span class="p">,</span> <span class="n">VerboseManager</span>
 </code></pre></div>    </div>
   </li>
-  <li>Get up your favourite process (example process given):
+  <li>Open your favourite process (example process given):
     <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">subprocess</span><span class="p">():</span>
  <span class="c1"># subprocess goes here
 </span> <span class="k">return</span> <span class="n">something</span>
@@ -103,28 +103,28 @@
 </span> <span class="k">return</span> <span class="n">something_else</span>
 </code></pre></div>    </div>
   </li>
-  <li>Add verbosemanager instantiation, start, step, and finish functions:
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">subprocess</span><span class="p">(</span><span class="n">verbose</span><span class="p">):</span>
+  <li>Add <code class="language-plaintext highlighter-rouge">VerboseManager</code> instantiation<sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup> and step functions, the <code class="language-plaintext highlighter-rouge">**verbose</code> kwarg to each of your functions, and the <code class="language-plaintext highlighter-rouge">@verbosemanager</code> decorator:
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">verbosemanager</span><span class="p">(</span><span class="n">n_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">subprocess</span><span class="p">(</span><span class="o">**</span><span class="n">verbose</span><span class="p">):</span>
  <span class="n">verbose_manager</span> <span class="o">=</span> <span class="n">VerboseManager</span><span class="p">.</span><span class="n">instance</span><span class="p">()</span>
- <span class="n">verbose_manager</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">n_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
  <span class="n">verbose_manager</span><span class="p">.</span><span class="n">step</span><span class="p">(</span><span class="s">"Subprocess step"</span><span class="p">)</span>
  <span class="c1"># subprocess goes here
-</span> <span class="n">verbose_manager</span><span class="p">.</span><span class="n">finish</span><span class="p">(</span><span class="s">"Subprocess"</span><span class="p">)</span>
+</span> <span class="k">return</span> <span class="n">something</span>
 <span class="err">‎</span>
-<span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">verbose</span><span class="p">):</span>
+<span class="o">@</span><span class="n">verbosemanager</span><span class="p">(</span><span class="n">n_steps</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="o">**</span><span class="n">verbose</span><span class="p">):</span>
  <span class="n">verbose_manager</span> <span class="o">=</span> <span class="n">VerboseManager</span><span class="p">.</span><span class="n">instance</span><span class="p">()</span>
- <span class="n">verbose_manager</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">n_steps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
  <span class="c1"># initialisation goes here
 </span> <span class="n">verbose_manager</span><span class="p">.</span><span class="n">step</span><span class="p">(</span><span class="s">"Step 1"</span><span class="p">)</span>
  <span class="c1"># step 1 code goes here
 </span> <span class="n">subprocess</span><span class="p">()</span>
  <span class="n">verbose_manager</span><span class="p">.</span><span class="n">step</span><span class="p">(</span><span class="s">"Step 2"</span><span class="p">)</span>
  <span class="c1"># step 2 code goes here
-</span> <span class="n">verbose_manager</span><span class="p">.</span><span class="n">finish</span><span class="p">(</span><span class="s">"Process"</span><span class="p">)</span>
+</span> <span class="k">return</span> <span class="n">something_else</span>
 </code></pre></div>    </div>
-    <p>(where the verbose_manager.start parameters are the number of steps between the start &amp; finish and the verbosity level)</p>
+    <p>(where the <code class="language-plaintext highlighter-rouge">@verbosemanager</code> parameter, <code class="language-plaintext highlighter-rouge">n_steps</code>, is the number of step functions called in the process (including those in subfunctions))</p>
   </li>
-  <li>You’re done! verbosemanager will automatically include the subprocess step in your full process (as long as you account for it in the steps parameter of verbose_manager.start) and users will see something like this after your function finishes:</li>
+  <li>You’re done! <code class="language-plaintext highlighter-rouge">VerboseManager</code> will automatically include the subprocess step in your full process (as long as you account for it in the steps parameter of <code class="language-plaintext highlighter-rouge">@verbosemanager</code>) and users will see something like this after your function finishes:</li>
 </ol>
 
 <pre><code class="language-ansiwhite">[===============] 100% Complete
@@ -136,6 +136,15 @@ Step 1: [time]
 Step 2: [time]
 </code></pre>
 
+<p>More flexibility is available by directly coding in start and stop functions for your verbose process, but the <code class="language-plaintext highlighter-rouge">@verbosemanager</code> decorator is a shortcut to access the management functions. See the documentation for details on directly using them.</p>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:1" role="doc-endnote">
+      <p><em>the instantiation functions are needed so the functions can access the <code class="language-plaintext highlighter-rouge">VerboseManager</code> class; Python scoping makes this unavoidable, sadly.</em> <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
 </div>
     </div>
     <footer class="footer mt-auto py-3">

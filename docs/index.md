@@ -18,12 +18,12 @@ Quick start
 pip3 install verbosemanager
 ```
 
-3. Import the VerboseManager class into your python script file:
+3. Import the `VerboseManager` class and `@verbosemanager` decorator into your python script file:
 ```python
-from verbosemanager import VerboseManager
+from verbosemanager import verbosemanager, VerboseManager
 ```
 
-4. Get up your favourite process (example process given): 
+4. Open your favourite process (example process given): 
 ```python
 def subprocess():
     # subprocess goes here
@@ -36,29 +36,29 @@ def process():
     # step 2 code goes here
     return something_else
 ```
-5. Add verbosemanager instantiation, start, step, and finish functions:
+5. Add `VerboseManager` instantiation[^1] and step functions, the `**verbose` kwarg to each of your functions, and the `@verbosemanager` decorator:
 ```python
-def subprocess(verbose):
+@verbosemanager(n_steps=1)
+def subprocess(**verbose):
     verbose_manager = VerboseManager.instance()
-    verbose_manager.start(n_steps=1, verbose=verbose)
     verbose_manager.step("Subprocess step")
     # subprocess goes here
-    verbose_manager.finish("Subprocess")
+    return something
 ‎
-def process(verbose):
+@verbosemanager(n_steps=3)
+def process(**verbose):
     verbose_manager = VerboseManager.instance()
-    verbose_manager.start(n_steps=3, verbose=verbose)
     # initialisation goes here
     verbose_manager.step("Step 1")
     # step 1 code goes here
     subprocess()
     verbose_manager.step("Step 2")
     # step 2 code goes here
-    verbose_manager.finish("Process")
+    return something_else
 ```
-(where the verbose_manager.start parameters are the number of steps between the start & finish and the verbosity level)
+(where the `@verbosemanager` parameter, `n_steps`, is the number of step functions called in the process (including those in subfunctions))
 
-6. You're done! verbosemanager will automatically include the subprocess step in your full process (as long as you account for it in the steps parameter of verbose_manager.start) and users will see something like this after your function finishes:
+6. You're done! `VerboseManager` will automatically include the subprocess step in your full process (as long as you account for it in the steps parameter of `@verbosemanager`) and users will see something like this after your function finishes:
 
 ```ansiwhite
 [===============] 100% Complete
@@ -70,3 +70,6 @@ Step 1: [time]
 Step 2: [time]
 ```
 
+More flexibility is available by directly coding in start and stop functions for your verbose process, but the `@verbosemanager` decorator is a shortcut to access the management functions. See the documentation for details on directly using them.
+
+[^1]: *the instantiation functions are needed so the functions can access the `VerboseManager` class; Python scoping makes this unavoidable, sadly.*
