@@ -12,7 +12,7 @@ def verbosemanager(n_steps):
             verbose_manager = VerboseManager.instance()
             verbose_manager.start(n_steps, verbose)
             func(*args, **kwargs)
-            verbose_manager.finish(func.__name__)
+            verbose_manager.finish(func.__name__.title())
 
         return wrapper
     return decorator
