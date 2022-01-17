@@ -50,4 +50,4 @@ plugins:
   - jekyll-sitemap
   - jekyll-feed
   
-remote-theme: https://github.com/andrewhwanpark/brutalist-blog
+remote-theme: andrewhwanpark/brutalist-blog 
