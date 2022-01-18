@@ -2,7 +2,7 @@ import pytest
 from pytest_cases import parametrize
 from time import sleep
 
-from src.verbosemanager import VerboseManager
+from verbosemanager import VerboseManager
 
 
 @pytest.fixture
