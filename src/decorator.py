@@ -1,7 +1,7 @@
 from . import VerboseManager
 
 
-def verbosemanager(n_steps):
+def verbosify(n_steps):
     def decorator(func):
         def wrapper(*args, **kwargs):
             try:

@@ -36,16 +36,16 @@ def process():
     # step 2 code goes here
     return something_else
 ```
-5. Add `VerboseManager` instantiation[^1] and step functions, the `**verbose` kwarg to each of your functions, and the `@verbosemanager` decorator:
+5. Add `VerboseManager` instantiation[^1] and step functions, the `**verbose` kwarg to each of your functions, and the `@verbosify` decorator:
 ```python
-@verbosemanager(n_steps=1)
+@verbosify(n_steps=1)
 def subprocess(**verbose):
     verbose_manager = VerboseManager.instance()
     verbose_manager.step("Subprocess step")
     # subprocess goes here
     return something
 ‎
-@verbosemanager(n_steps=3)
+@verbosify(n_steps=3)
 def process(**verbose):
     verbose_manager = VerboseManager.instance()
     # initialisation goes here
@@ -56,9 +56,9 @@ def process(**verbose):
     # step 2 code goes here
     return something_else
 ```
-(where the `@verbosemanager` parameter, `n_steps`, is the number of step functions called in the process (including those in subfunctions))
+(where the `@verbosify` parameter, `n_steps`, is the number of step functions called in the process (including those in subfunctions))
 
-6. You're done! `VerboseManager` will automatically include the subprocess step in your full process (as long as you account for it in the steps parameter of `@verbosemanager`) and users will see something like this after your function finishes:
+6. You're done! `VerboseManager` will automatically include the subprocess step in your full process (as long as you account for it in the steps parameter of `@verbosify`) and users will see something like this after your function finishes:
 
 ```ansiwhite
 [===============] 100% Complete
@@ -70,6 +70,6 @@ Step 1: [time]
 Step 2: [time]
 ```
 
-More flexibility is available by directly coding in start and stop functions for your verbose process, but the `@verbosemanager` decorator is a shortcut to access the management functions. See the documentation for details on directly using them.
+More flexibility is available by directly coding in start and stop functions for your verbose process, but the `@verbosify` decorator is a shortcut to access the management functions. See the documentation for details on directly using them.
 
 [^1]: *the instantiation functions are needed so the functions can access the `VerboseManager` class; Python scoping makes this unavoidable, sadly.*

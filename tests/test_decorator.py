@@ -2,7 +2,7 @@ import pytest
 from pytest_cases import parametrize
 from time import sleep
 
-from src import verbosemanager, VerboseManager
+from src import verbosify, VerboseManager
 
 
 @pytest.fixture
@@ -77,7 +77,7 @@ bigger_process_stdout = {1: 'Func complete in 0.05 seconds.\n',
 def test_decorator(verbose, capsys, process, n_steps, exp_stdout):
     """Tests the verbosemanager decorator"""
 
-    @verbosemanager(n_steps=n_steps)
+    @verbosify(n_steps=n_steps)
     def func(fn, **verbose):
         fn(verbose=verbose)
 

@@ -213,12 +213,12 @@ Subprocess calculation:
 Step 2: [time]
 ```
 
-The @verbosemanager wrapper
+The @verbosify wrapper
 -----------------------
-The @verbosemanager wrapper is just a shortcut for the `start()` and `finish()` methods. Indeed:
+The `@verbosify` wrapper is just a shortcut for the `start()` and `finish()` methods. Indeed:
 
 ```python
-@verbosemanager(1)
+@verbosify(1)
 def process(**verbose)
   verbose_manager = VerboseManager.instance()
   verbose_manager.step()
