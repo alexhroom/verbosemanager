@@ -1,1 +1,1 @@
-from verbosemanager import *
+from .verbosemanager import *
