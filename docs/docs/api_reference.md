@@ -1,6 +1,6 @@
 ---
 layout: default
-permalink: /verbosemanager/docs/api
+permalink: /docs/api
 ---
 
 API reference
