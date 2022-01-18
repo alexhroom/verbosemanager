@@ -1,4 +1,4 @@
-from verbosemanager import VerboseManager
+from . import VerboseManager
 
 
 def verbosemanager(n_steps):
