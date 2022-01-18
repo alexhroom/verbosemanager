@@ -5,7 +5,7 @@ layout: default
 documentation
 =============
 
-API reference available [here]({site.baseurl}/docs/api/).
+API reference available [here](https://alexhroom.github.io/verbosemanager/docs/api).
 
 Basic process management
 ------------------------
