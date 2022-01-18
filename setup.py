@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="verbosemanager",
-    version="1.0.2",
+    version="1.1.0",
     author="Alex H. Room",
     author_email="alex.room@btinternet.com",
     description="A library for managing verbose output on complex processes",
