@@ -1,2 +1,2 @@
-from verbosemanager import *
-from decorator import *
+from .verbosemanager import *
+from .decorator import *
