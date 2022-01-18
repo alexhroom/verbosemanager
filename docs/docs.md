@@ -234,6 +234,6 @@ process()
 verbose_manager.finish(process)
 ```
 
-This makes it less flexible, as you cannot run anything before starting the verbose management, nor can you change the name of the process given when it finishes (`verbose_manager.finish` here just uses the name of the process it's wrapped around), but it avoids busywork and easily-forgettable finish methods, as well as making your processes look cleaner.
+This makes it less flexible, as you cannot run anything before starting the verbose management, nor can you change the name of the process given when it finishes (`verbose_manager.finish` here just uses the name of the process it's wrapped around), but it avoids busywork and easily-forgettable finish methods, as well as making your processes look cleaner. An extra limitation (but one that should not usually matter) is that verbose must be a kwarg to work with the decorator.
 
 Annoyingly, one still needs to re-instantiate the `VerboseManager` object in each function, as Python scoping does not let a function access objects created in a decorator attached to it.
