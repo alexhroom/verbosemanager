@@ -35,6 +35,7 @@ class VerboseManager:
         self.timings_list = []
         self.subprocess_start_times = []
         self.buffer = None
+        self.prev_message = "Initialising"
 
     def start(self, n_steps: int, verbose: int = 0):
         """
@@ -72,7 +73,6 @@ class VerboseManager:
                 sys.stdout.write('\n')
                 self._print_progress(0, self.maximum, "Initialising")
             if self.step_times:
-                self.prev_message = "Initialising"
                 self.step_time = self.start_time
         else:
             # else, a subprocess called this method; account for it
