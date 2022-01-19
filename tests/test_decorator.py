@@ -42,7 +42,7 @@ process_stdout = {1: "Func complete in 0.03 seconds.",
                       "Initialising: 0.01\n"
                       "Process step 1: 0.01\n"
                       "Process step 2: 0.01\n"),
-                  3: ("\n\r[                    ] 0%  Initialising   "
+                  3: ("\n\r[                    ] 0%  Initialising "
                       "\r[==========          ] 50%  Process step 1; previous step took 0.01 seconds. "
                       "\r[====================] 100%  Process step 2; previous step took 0.01 seconds. \n"
                       "Func complete in 0.03 seconds.\n"
@@ -59,7 +59,7 @@ bigger_process_stdout = {1: 'Func complete in 0.05 seconds.\n',
                             'Subprocess: \n'
                             'Process step 1: 0.01\n'
                             'Process step 2: 0.01\n',
-                         3: '\n\r[                    ] 0%  Initialising   '
+                         3: '\n\r[                    ] 0%  Initialising '
                             '\r[======              ] 33%  Bigger process step 1; previous step took 0.01 seconds. '
                             '\r[=============       ] 66%  Process step 1; previous step took 0.02 seconds. '
                             '\r[====================] 100%  Process step 2; previous step took 0.01 seconds. \n'
