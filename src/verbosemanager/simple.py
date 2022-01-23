@@ -6,7 +6,7 @@ from typing import Union
 from .verbosemanager import ManagerMixins
 
 
-def simpleverbose(n_subprocesses, counter):
+def simpleverbose(n_subprocesses, counter=False):
     """
     A decorator that completely handles verbose processes on your behalf.
     The function that simpleverbose is attached to must have 'verbose' entered as a **kwarg.
