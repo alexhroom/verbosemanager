@@ -3,9 +3,11 @@ import warnings
 from time import time, asctime, localtime
 from typing import Union
 
+from .counter import Counter
 
-class VerboseManager:
-    """VerboseManager is a Singleton pattern class which manages verbose printing of a process."""
+
+class ManagerMixins:
+    """A mixin class for attributes shared by VerboseManager and SimpleManager"""
     _instance = None
     # max_print_len decides how many lines of output are printed to stdout
     # before they are printed to file instead; this can be changed by user
@@ -15,8 +17,21 @@ class VerboseManager:
         raise RuntimeError("VerboseManager should not be instantiated directly. Use VerboseManager.instance().")
 
     @classmethod
-    def instance(cls):
-        """Instantiates a VerboseManager if one does not exist, and returns the existing one if it does exist."""
+    def instance(cls, counter=False):
+        """
+        Instantiates a VerboseManager if one does not exist, and returns the existing one if it does exist.
+
+        Parameters:
+        -----------
+        counter: bool = False
+            If True, replaces the manager with a Counter object, which returns info on your process' verbose output.
+            Used for development.
+        """
+        if counter:
+            return Counter.instance()
+        # if a subprocess doesn't have counter=True, don't create a manager on top of the counter
+        if type(cls._instance) == Counter:
+            return cls._instance
         if cls._instance is None:
             cls._instance = cls.__new__(cls)
             cls._instance._init()
@@ -36,48 +51,7 @@ class VerboseManager:
         self.subprocess_start_times = []
         self.buffer = None
         self.prev_message = "Initialising"
-
-    def start(self, n_steps: int, verbose: int = 0):
-        """
-        Initialises progress management, including times and a progress bar.
-        If a progress bar is already running, this is ignored.
-
-        Parameters
-        ----------
-        n_steps: int
-            The amount of steps involved in the process.
-        verbose: int
-            The level of verbosity:
-            Verbose level 0 gives no information.
-            Verbose level 1 gives final time for a whole process.
-            Verbose level 2 gives final time and also a progress bar.
-            Verbose level 3 gives final time, a progress bar, and time per step.
-        """
-        # activate features based on verbosity level
-        if verbose >= 1:
-            self.times = True
-        if verbose >= 2:
-            self.step_times = True
-        if verbose >= 3:
-            self.bar = True
-
-        if not self._in_progress:
-            # if not in progress, initialise process
-            self._in_progress = True
-            self.progress = 0
-            self.maximum = n_steps
-
-            if self.times:
-                self.start_time = time()
-            if self.bar:
-                sys.stdout.write('\n')
-                self._print_progress(0, self.maximum, "Initialising")
-            if self.step_times:
-                self.step_time = self.start_time
-        else:
-            # else, a subprocess called this method; account for it
-            self.subprocesses += 1
-            self.subprocess_start_times.append(time())
+        self.progress = 0
 
     def step(self, message: str):
         """
@@ -108,21 +82,6 @@ class VerboseManager:
         # if verbosity is 3, print progress bar
         if self.bar:
             self._print_progress(self.progress, self.maximum, message)
-
-    def header(self, message: str):
-        """
-        Adds a line to final step timings print without affecting step progress or advancement.
-
-        Parameters
-        ----------
-        message: str
-            The header message that will be printed.
-        """
-
-        # since a step isn't added to the timings list until it is finished,
-        # this will print one step too early unless we buffer it and add
-        # it after the current step completes
-        self.buffer = ('|' * self.subprocesses + message, "")
 
     def finish(self, process_name: str) -> Union[None, float, list]:
         """
@@ -185,7 +144,11 @@ class VerboseManager:
         [================    ] 80%  message
         """
         bar_size = 20
-        progress = i / maximum
+        try:
+            progress = i / maximum
+        except ZeroDivisionError:
+            warnings.warn("Your function has zero verbose steps. Was this intentional?")
+            return
 
         # calculate how much trailing whitespace is needed
         # to avoid previous message being visible under new one
@@ -229,3 +192,67 @@ class VerboseManager:
             for step_timing in cls._instance.timings_list:
                 print(f"{step_timing[0]}: {step_timing[1]}")
 
+
+class VerboseManager(ManagerMixins):
+    """VerboseManager is a Singleton pattern class which manages verbose printing of a process."""
+    _instance = None
+    # max_print_len decides how many lines of output are printed to stdout
+    # before they are printed to file instead; this can be changed by user
+    max_output_len = 20
+
+    def start(self, n_steps: int, verbose: int = 0):
+        """
+        Initialises progress management, including times and a progress bar.
+        If a progress bar is already running, accounts for the subprocess which called this.
+
+        Parameters
+        ----------
+        n_steps: int
+            The amount of steps involved in the process (including those in subprocesses).
+        verbose: int
+            The level of verbosity:
+            Verbose level 0 gives no information.
+            Verbose level 1 gives final time for a whole process.
+            Verbose level 2 gives final time and also a progress bar.
+            Verbose level 3 gives final time, a progress bar, and time per step.
+        """
+        # activate features based on verbosity level
+        if verbose >= 1:
+            self.times = True
+        if verbose >= 2:
+            self.step_times = True
+        if verbose >= 3:
+            self.bar = True
+
+        if not self._in_progress:
+            # if not in progress, initialise process
+            self._in_progress = True
+            self.progress = 0
+            self.maximum = n_steps
+
+            if self.times:
+                self.start_time = time()
+            if self.bar:
+                sys.stdout.write('\n')
+                self._print_progress(0, self.maximum, "Initialising")
+            if self.step_times:
+                self.step_time = self.start_time
+        else:
+            # else, a subprocess called this method; account for it
+            self.subprocesses += 1
+            self.subprocess_start_times.append(time())
+
+    def header(self, message: str):
+        """
+        Adds a line to final step timings print without affecting step progress or advancement.
+
+        Parameters
+        ----------
+        message: str
+            The header message that will be printed.
+        """
+
+        # since a step isn't added to the timings list until it is finished,
+        # this will print one step too early unless we buffer it and add
+        # it after the current step completes
+        self.buffer = ('|' * self.subprocesses + message, "")
