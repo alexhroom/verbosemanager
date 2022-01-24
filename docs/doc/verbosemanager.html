@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+
+<html lang="python">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>The VerboseManager class &#8212; verbosemanager 1.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The SimpleVerbose manager" href="simpleverbose.html" />
+    <link rel="prev" title="about" href="../about/about.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="the-verbosemanager-class">
+<h1>The VerboseManager class<a class="headerlink" href="#the-verbosemanager-class" title="Permalink to this headline">¶</a></h1>
+<section id="basic-process-management">
+<h2>Basic process management<a class="headerlink" href="#basic-process-management" title="Permalink to this headline">¶</a></h2>
+<p>For a simple process with no sub-functions (or at least, none that would
+require their own verbose handling), <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> handles
+management like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+    <span class="n">verbose_manager</span> <span class="o">=</span> <span class="n">VerboseManager</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="c1"># initialisation goes here</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="s2">&quot;Step 1&quot;</span><span class="p">)</span>
+    <span class="c1"># step 1 code goes here</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="s2">&quot;Step 2&quot;</span><span class="p">)</span>
+    <span class="c1"># step 2 code goes here</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="s2">&quot;Process&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> must be instantiated using
+<code class="docutils literal notranslate"><span class="pre">VerboseManager.instance()</span></code>; trying to instantiate it using
+<code class="docutils literal notranslate"><span class="pre">VerboseManager()</span></code> will throw a runtime error. The reason for this is
+because <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> is a Singleton class - no matter where you
+instantiate it, it gives you the same single <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> object.
+This is how it manages to track its way through subprocesses etc.</p>
+<p>To start the process for <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> instance
+<code class="docutils literal notranslate"><span class="pre">verbose_manager</span></code>, we use <code class="docutils literal notranslate"><span class="pre">verbose_manager.start(n_steps,</span> <span class="pre">verbose)</span></code>.
+This takes two arguments. <code class="docutils literal notranslate"><span class="pre">n_steps</span></code> is the number of steps the process
+involves - see in the example, this is 2 as the step method is called
+two times. Sadly, this must be calculated manually (or for functions with a fixed number of steps, by the counter - see the Counting and debugging section); this is unavoidable,
+as Python is not a compiled language. The second parameter is
+<code class="docutils literal notranslate"><span class="pre">verbose</span></code>, which gives the verbosity level for the process. The levels
+are like so:</p>
+<ul class="simple">
+<li><p>Verbosity 0: no output is given. This is here to save processes from
+having to include a &quot;<code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">verbosity&gt;0;</span> <span class="pre">verbose_manager.start()</span></code>&quot;
+block - if verbosity is 0, the manager is called and ignored
+entirely.</p></li>
+<li><p>Verbosity 1; no output is given during the process, but when a
+process finishes, the time taken for the whole process is printed,
+and the time taken for a process and all its subprocesses is returned
+as a variable when each process finishes.</p></li>
+<li><p>Verbosity 2; the features of verbosity 1, and additionally and
+additionally at each step a timing is given next to the progress bar
+with how long the previous step took; at the end of the process, a
+list of timings for each step is printed.</p></li>
+<li><p>Verbosity 3; the features of verbosity 1 and 2, and additionally a
+progress bar is given with progress percentage and a message for each
+step.</p></li>
+</ul>
+<p>After starting, we can advance verbose printing for the process using
+the method <code class="docutils literal notranslate"><span class="pre">verbose_manager.step(message)</span></code>. This advances the process
+by one step, increasing the progress bar and also giving the <code class="docutils literal notranslate"><span class="pre">message</span></code>
+parameter as a message next to it. This message should describe what the
+current step is doing.</p>
+<p>When the process is done, verbose management can be completed using
+<code class="docutils literal notranslate"><span class="pre">verbose_manager.finish(process_name)</span></code>. This will end verbose
+management for the process (or subprocess). If it is a main process,
+time taken will be printed and returned as a variable. If it is a
+subprocess, time taken for the subprocess will be returned as a
+variable. <code class="docutils literal notranslate"><span class="pre">process_name</span></code> is, of course, a string with the name of the
+process; final timings will be printed in the format &quot;[process_name]
+complete in [time] seconds.&quot;. Note that if n_steps was set incorrectly,
+at this point <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> will throw a warning telling you how
+many steps it actually took; if your process takes a fixed number of
+steps, you could use this as a quick way of calculating n_steps.</p>
+<p>At verbosity 3, the example given above would print the following at the
+end of the process:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[===============] 100% Complete</span>
+<span class="go">Process completed in [time] seconds.</span>
+<span class="go">Timings per step:</span>
+<span class="go">Initialisation: [time]</span>
+<span class="go">Step 1: [time]</span>
+<span class="go">Step 2: [time]</span>
+</pre></div>
+</div>
+</section>
+<section id="subprocess-management">
+<h2>Subprocess management<a class="headerlink" href="#subprocess-management" title="Permalink to this headline">¶</a></h2>
+<p>If a process involves sub-processes, like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">subprocess</span><span class="p">():</span>
+    <span class="c1"># subprocess goes here</span>
+
+<span class="k">def</span> <span class="nf">process</span><span class="p">():</span>
+    <span class="c1"># initialisation goes here</span>
+    <span class="c1"># process code goes here</span>
+    <span class="n">subprocess</span><span class="p">()</span>
+    <span class="c1"># more process code goes here</span>
+</pre></div>
+</div>
+<p>it is incredibly easy to add the subprocess to <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code>’s
+subprocess management. You simply do the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">subprocess</span><span class="p">():</span>
+    <span class="n">verbose_manager</span> <span class="o">=</span> <span class="n">VerboseManager</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="s2">&quot;Subprocess step&quot;</span><span class="p">)</span>
+    <span class="c1"># subprocess goes here</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="s2">&quot;Subprocess&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">process</span><span class="p">():</span>
+    <span class="n">verbose_manager</span> <span class="o">=</span> <span class="n">VerboseManager</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="c1"># initialisation goes here</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="s2">&quot;Step 1&quot;</span><span class="p">)</span>
+    <span class="c1"># step 1 code goes here</span>
+    <span class="n">subprocess</span><span class="p">()</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="s2">&quot;Step 2&quot;</span><span class="p">)</span>
+    <span class="c1"># step 2 code goes here</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="s2">&quot;Process&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>that is, to add the subprocess we simply instantiate, start, step and
+finish the exact same way as we do in the main process.
+<code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> will recognise that a process is already being
+managed, and nest the steps of the subprocess into it.</p>
+<p>The only caveat is that <code class="docutils literal notranslate"><span class="pre">n_steps</span></code> in the outermost (main) process must
+account for the steps contained in subprocesses. The <code class="docutils literal notranslate"><span class="pre">n_steps</span></code> in the
+subprocess is ignored entirely (and would only be used if one was
+directly calling the subprocess). This is for a reason; if we added the
+subprocess steps to the main process’ management as we went, the
+progress bar would be incorrect before subprocesses get factored in. At
+step 1, it would say we were 50% complete, whereas in fact we have only
+done 1 out of 3 steps, so we are in fact 33% complete. This error would
+not be corrected until the subprocess starts, leading to weird and
+inconsistent output. In fact, if a process had 2 steps and contained a
+subprocess with 3 steps, the progress bar would go from 50% to 40% (1/2
+to 2/5) when the subprocess starts.</p>
+<p>This example would output like so at the end of the process on verbosity
+3:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[===============] 100% Complete</span>
+<span class="go">Process completed in [time] seconds.</span>
+<span class="go">Timings per step:</span>
+<span class="go">Initialisation: [time]</span>
+<span class="go">Step 1: [time]</span>
+<span class="go">|Subprocess step: [time]</span>
+<span class="go">Step 2: [time]</span>
+</pre></div>
+</div>
+<p>A vertical bar is used to denote the nesting level of subprocesses. As
+an example of this, if the subprocess had multiple steps including its
+own subprocess, and that sub-subprocess had its own subprocess, it would
+nest like so:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[===============] 100% Complete</span>
+<span class="go">Process completed in [time] seconds.</span>
+<span class="go">Timings per step:</span>
+<span class="go">Initialisation: [time]</span>
+<span class="go">Step 1: [time]</span>
+<span class="go">|Subprocess step 1: [time]</span>
+<span class="go">||Sub-subprocess step: [time]</span>
+<span class="go">|||Sub-sub-subprocess step: [time]</span>
+<span class="go">|Subprocess step 2: [time]</span>
+<span class="go">Step 2: [time]</span>
+</pre></div>
+</div>
+<p>We can also get timings for a whole subprocess as a return variable,
+that is <code class="docutils literal notranslate"><span class="pre">timings</span> <span class="pre">=</span> <span class="pre">verbose_manager.finish(&quot;Subprocess&quot;)</span></code>. This will
+return the time for the entire subprocess, regardless of how many steps
+or sub-subprocesses it goes into. These subprocess timings are stored
+simply as a stack; for each new subprocess, its start time is stored,
+then retrieved and popped when that subprocess finishes.</p>
+<p>The user can also use the method <code class="docutils literal notranslate"><span class="pre">verbose_manager.header(message)</span></code> to
+add headers to parts of the final timings list. For example, if we
+wanted to add a header to indicate the part of the code that was in the
+subprocess, we could add to the previous example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process</span><span class="p">():</span>
+    <span class="c1"># initialisation etc here</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="s2">&quot;Step 1&quot;</span><span class="p">)</span>
+    <span class="c1"># step 1 code here</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s2">&quot;Subprocess calculation&quot;</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="p">()</span>
+    <span class="c1"># etc...</span>
+</pre></div>
+</div>
+<p>which would print like so:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[===============] 100% Complete</span>
+<span class="go">Process completed in [time] seconds.</span>
+<span class="go">Timings per step:</span>
+<span class="go">Initialisation: [time]</span>
+<span class="go">Step 1: [time]</span>
+<span class="go">Subprocess calculation:</span>
+<span class="go">|Subprocess step 1: [time]</span>
+<span class="go">||Sub-subprocess step: [time]</span>
+<span class="go">|||Sub-sub-subprocess step: [time]</span>
+<span class="go">|Subprocess step 2: [time]</span>
+<span class="go">Step 2: [time]</span>
+</pre></div>
+</div>
+</section>
+<section id="counting-and-debugging">
+<h2>Counting and debugging<a class="headerlink" href="#counting-and-debugging" title="Permalink to this headline">¶</a></h2>
+<p>For development, there is an optional parameter to <code class="docutils literal notranslate"><span class="pre">VerboseManager.instance()</span></code>. If we set <code class="docutils literal notranslate"><span class="pre">VerboseManager.instance(counter=True)</span></code>, instead of verbose management the manager object will debug the process. It will give an error if any <code class="docutils literal notranslate"><span class="pre">start()</span></code> is missing a corresponding <code class="docutils literal notranslate"><span class="pre">finish()</span></code>, and at the end both print and return as a dictionary the number of steps and subprocesses in your process; this is very useful for calculating the <code class="docutils literal notranslate"><span class="pre">n_steps</span></code> parameter of your <code class="docutils literal notranslate"><span class="pre">start()</span></code> function.</p>
+</section>
+<section id="the-verbosedecorator-wrapper">
+<h2>The &#64;verbosedecorator wrapper<a class="headerlink" href="#the-verbosedecorator-wrapper" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">&#64;verbosedecorator</span></code> wrapper is just a shortcut for the <code class="docutils literal notranslate"><span class="pre">start()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">finish()</span></code> methods. Indeed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@verbosedecorator</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="o">**</span><span class="n">verbose</span><span class="p">)</span>
+  <span class="n">verbose_manager</span> <span class="o">=</span> <span class="n">VerboseManager</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+  <span class="n">verbose_manager</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+  <span class="k">return</span>
+</pre></div>
+</div>
+<p>just does the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">verbose_manager</span> <span class="o">=</span> <span class="n">VerboseManager</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+<span class="n">verbose_manager</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">kwargs</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
+<span class="n">process</span><span class="p">()</span>
+<span class="n">verbose_manager</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This makes it less flexible, as you cannot run anything before starting
+the verbose management, nor can you change the name of the process given
+when it finishes (<code class="docutils literal notranslate"><span class="pre">verbose_manager.finish</span></code> here just uses the name of
+the process it’s wrapped around), but it avoids busywork and
+easily-forgettable finish methods, as well as making your processes look
+cleaner. An extra limitation (but one that should not usually matter) is
+that verbose must be a kwarg to work with the decorator.</p>
+<p>Annoyingly, one still needs to re-instantiate the <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code>
+object in each function, as Python scoping does not let a function
+access objects created in a decorator attached to it.</p>
+<p>You can also use the counter with the decorator by specifying <code class="docutils literal notranslate"><span class="pre">&#64;verbosedecorator(n_steps,</span> <span class="pre">counter=True)</span></code>.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">verbosemanager</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">About:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../about/about.html">about</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The VerboseManager class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-process-management">Basic process management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#subprocess-management">Subprocess management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#counting-and-debugging">Counting and debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-verbosedecorator-wrapper">The &#64;verbosedecorator wrapper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="simpleverbose.html">The SimpleVerbose manager</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../about/about.html" title="previous chapter">about</a></li>
+      <li>Next: <a href="simpleverbose.html" title="next chapter">The SimpleVerbose manager</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alex H. Room.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/doc/verbosemanager.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,223 @@
+
+<!DOCTYPE html>
+
+<html lang="python">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>verbosemanager &#8212; verbosemanager 1.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="about" href="about/about.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="verbosemanager">
+<h1>verbosemanager<a class="headerlink" href="#verbosemanager" title="Permalink to this headline">¶</a></h1>
+<p>verbosemanager is a Python module made for managing verbose output on a
+complex Python method or function (i.e. one which goes into
+sub-functions). It allows a process to ‘carry’ its own verbose
+management through these sub-functions.</p>
+<p>If that answers all your questions, see the ‘quick start’ guide below.
+Else, see the ‘about’ and ‘documentation’ headings below and in the sidebar for further information.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">About:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about/about.html">about</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="doc/verbosemanager.html">The VerboseManager class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/verbosemanager.html#basic-process-management">Basic process management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/verbosemanager.html#subprocess-management">Subprocess management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/verbosemanager.html#counting-and-debugging">Counting and debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/verbosemanager.html#the-verbosedecorator-wrapper">The &#64;verbosedecorator wrapper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/simpleverbose.html">The SimpleVerbose manager</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/simpleverbose.html#counting-and-debugging">Counting and debugging</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="quick-start">
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Ensure you have Python 3.6 or greater.</p></li>
+<li><p>Install the module using pip:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="n">verbosemanager</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Import the <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> class and <code class="docutils literal notranslate"><span class="pre">&#64;verbosemanager</span></code> decorator
+into your python script file:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">verbosemanager</span> <span class="kn">import</span> <span class="n">verbosemanager</span><span class="p">,</span> <span class="n">VerboseManager</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Open your favourite process (example process given):</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>def subprocess():
+    # subprocess goes here
+    return something
+‎‎‎
+def process():
+    # initialisation goes here
+    # step 1 code goes here
+    subprocess()
+    # step 2 code goes here
+    return something_else
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> instantiation <a class="footnote-reference brackets" href="#id2" id="id1">1</a> and step functions, the
+<code class="docutils literal notranslate"><span class="pre">**verbose</span></code> kwarg to each of your functions, and the <code class="docutils literal notranslate"><span class="pre">&#64;verbosedecorator</span></code> decorator:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>@verbosedecorator(n_steps=1)
+def subprocess(**verbose):
+    verbose_manager = VerboseManager.instance()
+    verbose_manager.step(&quot;Subprocess step&quot;)
+    # subprocess goes here
+    return something
+‎
+@verbosedecorator(n_steps=3)
+def process(**verbose):
+    verbose_manager = VerboseManager.instance()
+    # initialisation goes here
+    verbose_manager.step(&quot;Step 1&quot;)
+    # step 1 code goes here
+    subprocess()
+    verbose_manager.step(&quot;Step 2&quot;)
+    # step 2 code goes here
+    return something_else
+</pre></div>
+</div>
+<p>(where the <code class="docutils literal notranslate"><span class="pre">&#64;verbosedecorator</span></code> parameter, <code class="docutils literal notranslate"><span class="pre">n_steps</span></code>, is the number of step
+functions called in the process (including those in subfunctions))</p>
+<ol class="arabic simple" start="6">
+<li><p>You’re done! <code class="docutils literal notranslate"><span class="pre">VerboseManager</span></code> will automatically include the
+subprocess step in your full process (as long as you account for it
+in the steps parameter of <code class="docutils literal notranslate"><span class="pre">&#64;verbosedecorator</span></code>) and users will see
+something like this after your function finishes:</p></li>
+</ol>
+<div class="highlight-ansiwhite notranslate"><div class="highlight"><pre><span></span>[===============] 100% Complete
+Process completed in [time] seconds.
+Timings per step:
+Initialisation: [time]
+Step 1: [time]
+|Subprocess step: [time]
+Step 2: [time]
+</pre></div>
+</div>
+<p>More flexibility is available by directly coding in start and stop
+functions for your verbose process, but the <code class="docutils literal notranslate"><span class="pre">&#64;verbosedecorator</span></code> decorator is
+a shortcut to access the management functions. See the documentation for
+details on directly using them.</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p><em>the instantiation functions are needed so the functions can access
+the ``VerboseManager`` class; Python scoping makes this unavoidable,
+sadly.</em></p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">verbosemanager</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">About:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about/about.html">about</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="doc/verbosemanager.html">The VerboseManager class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/simpleverbose.html">The SimpleVerbose manager</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="about/about.html" title="next chapter">about</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alex H. Room.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
