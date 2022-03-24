@@ -273,7 +273,7 @@ class VerboseManager(ManagerMixins):
             if len(self.iter_steps) == 0:
                 self.prev_iter_step_time = time()
                 self.header("Entering iterator")
-                self.step("Iterator total")
+                self.step("Iterator")
 
             try:
                 self.iter_steps[message].append(time() - self.prev_iter_step_time)

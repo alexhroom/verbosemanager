@@ -46,7 +46,7 @@ EXP_STDOUT = {'process_stdout': {1: "Process complete in 0.03 seconds.",
                                            3: '\n'
                                               '\r'
                                               '[                    ] 0%  Initialising \r'
-                                              '[==========          ] 50%  Iterator total; previous step took 0.01 '
+                                              '[==========          ] 50%  Iterator; previous step took 0.01 '
                                               'seconds. \r'
                                               '[==========          ] 50%  Iterator step '
                                               '1                                  \r'
@@ -75,5 +75,5 @@ EXP_STDOUT = {'process_stdout': {1: "Process complete in 0.03 seconds.",
                                               'Entering iterator: \n'
                                               '|Iterator step 1: Average 0.03 over 5 iterations\n'
                                               '|Iterator step 2: Average 0.03 over 5 iterations\n'
-                                              'Iterator total: 0.3\n'
+                                              'Iterator: 0.3\n'
                                               'Finishing: 0.0\n'}}
