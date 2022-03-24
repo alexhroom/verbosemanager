@@ -269,12 +269,12 @@ class VerboseManager(ManagerMixins):
         iteration_message: str, optional
             An optional message for this specific iteration, used in the progress bar.
         """
-        if self.step_times:
-            if len(self.iter_steps) == 0:
-                self.prev_iter_step_time = time()
-                self.header("Entering iterator")
-                self.step("Iterator")
+        if len(self.iter_steps) == 0:
+            self.prev_iter_step_time = time()
+            self.header("Entering iterator")
+            self.step("Iterator")
 
+        if self.step_times:
             try:
                 self.iter_steps[message].append(time() - self.prev_iter_step_time)
             except KeyError:  # if this iter step hasn't been run yet
