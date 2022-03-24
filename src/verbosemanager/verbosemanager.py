@@ -54,6 +54,7 @@ class ManagerMixins:
         self.prev_message = "Initialising"
         self.progress = 0
         self.iter_steps = {}
+        self.iterating = False
 
     def step(self, message: str):
         """
@@ -269,7 +270,8 @@ class VerboseManager(ManagerMixins):
         iteration_message: str, optional
             An optional message for this specific iteration, used in the progress bar.
         """
-        if len(self.iter_steps) == 0:
+        if self.iterating == False:
+            self.iterating = True
             self.prev_iter_step_time = time()
             self.header("Entering iterator")
             self.step("Iterator")
@@ -302,3 +304,4 @@ class VerboseManager(ManagerMixins):
                                           f"Average {round(self.iter_steps[key], 2)} over {iterations + 1} iterations"))
 
             self.iter_steps = {}
+            self.iterating = False
