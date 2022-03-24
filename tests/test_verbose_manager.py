@@ -4,6 +4,8 @@ from time import sleep
 
 from verbosemanager import VerboseManager
 
+from tests.expected_values.stdout import EXP_STDOUT
+
 
 @pytest.fixture
 def process():
@@ -39,6 +41,25 @@ def bigger_process(process):
     return _bigger_process
 
 
+@pytest.fixture
+def iterative_process():
+    """A mock process containing an iterator"""
+
+    def _iterative_process(verbose):
+        vman = VerboseManager.instance()
+        vman.start(2, verbose=verbose)
+        sleep(0.01)
+        for i in range(5):
+            vman.iterate("Iterator step 1")
+            sleep(i * 10e-3)
+            vman.iterate("Iterator step 2", iteration_message=f"for iteration {i}")
+            sleep(i * 2 * 10e-3)
+        vman.finish_iterate()
+        vman.step("Finishing")
+        vman.finish("Iterative process")
+
+    return _iterative_process
+
 def test_progress():
     """Tests that progress increases and decreases as intended with different methods"""
     vman = VerboseManager.instance()
@@ -54,47 +75,16 @@ def test_progress():
     vman.finish("restart test")
 
 
-# stdout for the fixtures at each verbosity level
-process_stdout = {1: "Process complete in 0.03 seconds.",
-                  2: ("Process complete in 0.03 seconds.\n"
-                      "Timings per step:\n"
-                      "Initialising: 0.01\n"
-                      "Process step 1: 0.01\n"
-                      "Process step 2: 0.01\n"),
-                  3: ("\n\r[                    ] 0%  Initialising "
-                      "\r[==========          ] 50%  Process step 1; previous step took 0.01 seconds. "
-                      "\r[====================] 100%  Process step 2; previous step took 0.01 seconds. \n"
-                      "Process complete in 0.03 seconds.\n"
-                      "Timings per step:\n"
-                      "Initialising: 0.01\n"
-                      "Process step 1: 0.01\n"
-                      "Process step 2: 0.01\n")}
-
-bigger_process_stdout = {1: 'Bigger process complete in 0.05 seconds.\n',
-                         2: 'Bigger process complete in 0.05 seconds.\n'
-                            'Timings per step:\n'
-                            'Initialising: 0.01\n'
-                            'Bigger process step 1: 0.02\n'
-                            'Subprocess: \n'
-                            '|Process step 1: 0.01\n'
-                            '|Process step 2: 0.01\n',
-                         3: '\n\r[                    ] 0%  Initialising '
-                            '\r[======              ] 33%  Bigger process step 1; previous step took 0.01 seconds. '
-                            '\r[=============       ] 66%  Process step 1; previous step took 0.02 seconds.  '
-                            '\r[====================] 100%  Process step 2; previous step took 0.01 seconds.  \n'
-                            'Bigger process complete in 0.05 seconds.\n'
-                            'Timings per step:\n'
-                            'Initialising: 0.01\n'
-                            'Bigger process step 1: 0.02\n'
-                            'Subprocess: \n'
-                            '|Process step 1: 0.01\n'
-                            '|Process step 2: 0.01\n'}
-
-
 @parametrize("verbose", [1, 2, 3])
-@parametrize("func, exp_stdout", [(process, process_stdout),
-                                  (bigger_process, bigger_process_stdout)])
+@parametrize("func, exp_stdout", [(process, 'process_stdout'),
+                                  (bigger_process, 'bigger_process_stdout')])
 def test_stdout(func, exp_stdout, capsys, verbose):
     func(verbose=verbose)
     stdout = capsys.readouterr().out
-    assert exp_stdout[verbose] in stdout
+    assert (EXP_STDOUT[f'{exp_stdout}'])[verbose] in stdout
+
+@parametrize("verbose", [1, 2, 3])
+def test_iterate(iterative_process, capsys, verbose):
+    iterative_process(verbose=verbose)
+    stdout = capsys.readouterr().out
+    assert EXP_STDOUT['iterative_process_stdout'][verbose] in stdout
