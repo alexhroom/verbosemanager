@@ -220,6 +220,47 @@ subprocess, we could add to the previous example:</p>
 </pre></div>
 </div>
 </section>
+<section id="iterators">
+<h2>Iterators<a class="headerlink" href="#iterators" title="Permalink to this headline">¶</a></h2>
+<p>VerboseManager supports iterators using the <code class="docutils literal notranslate"><span class="pre">iterate(&quot;Iterator</span> <span class="pre">step&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">finish_iterate()</span></code> methods, letting you count a whole iterator as one step without the inside of the iterator being a black box.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process</span><span class="p">():</span>
+    <span class="c1"># initialisation etc here</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">verbose_manager</span><span class="o">.</span><span class="n">iterate</span><span class="p">(</span><span class="s2">&quot;Iterator step 1&quot;</span><span class="p">,</span> <span class="n">iteration_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;for </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># step 1 here</span>
+        <span class="n">verbose_manager</span><span class="o">.</span><span class="n">iterate</span><span class="p">(</span><span class="s2">&quot;Iterator step 2&quot;</span><span class="p">,</span> <span class="n">iteration_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;for </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># step 2 here</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">finish_iterate</span><span class="p">()</span>
+    <span class="n">verbose_manager</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="s2">&quot;Normal step&quot;</span><span class="p">)</span>
+    <span class="c1"># etc...</span>
+</pre></div>
+</div>
+<p>Would print the following:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[===============] 100% Complete</span>
+<span class="go">Process completed in [time] seconds.</span>
+<span class="go">Timings per step:</span>
+<span class="go">Initialisation: [time]</span>
+<span class="go">Entering iterator:</span>
+<span class="go">|Iterator step 1: Average [time] over X iterations</span>
+<span class="go">|Iterator step 2: Average [time] over X iterations</span>
+<span class="go">Iterator: [time]</span>
+<span class="go">Normal step: [time]</span>
+</pre></div>
+</div>
+<p>And produce progress bars like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">[               ] 0% Initialising</span>
+<span class="go">[========       ] 50% Iterator</span>
+<span class="go">[========       ] 50% Iterator step 1 for list_item_1</span>
+<span class="go">[========       ] 50% Iterator step 2 for list_item_1</span>
+<span class="go">[========       ] 50% Iterator step 1 for list_item_2</span>
+<span class="go">[========       ] 50% Iterator step 2 for list_item_2</span>
+<span class="go">etc...</span>
+<span class="go">[===============] 100% Normal step</span>
+<span class="go">[===============] 100% Complete</span>
+</pre></div>
+</div>
+<p>counting the entire iterator as one step but still providing information.</p>
+</section>
 <section id="counting-and-debugging">
 <h2>Counting and debugging<a class="headerlink" href="#counting-and-debugging" title="Permalink to this headline">¶</a></h2>
 <p>For development, there is an optional parameter to <code class="docutils literal notranslate"><span class="pre">VerboseManager.instance()</span></code>. If we set <code class="docutils literal notranslate"><span class="pre">VerboseManager.instance(counter=True)</span></code>, instead of verbose management the manager object will debug the process. It will give an error if any <code class="docutils literal notranslate"><span class="pre">start()</span></code> is missing a corresponding <code class="docutils literal notranslate"><span class="pre">finish()</span></code>, and at the end both print and return as a dictionary the number of steps and subprocesses in your process; this is very useful for calculating the <code class="docutils literal notranslate"><span class="pre">n_steps</span></code> parameter of your <code class="docutils literal notranslate"><span class="pre">start()</span></code> function.</p>
@@ -282,6 +323,7 @@ access objects created in a decorator attached to it.</p>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The VerboseManager class</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#basic-process-management">Basic process management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#subprocess-management">Subprocess management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#iterators">Iterators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#counting-and-debugging">Counting and debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#the-verbosedecorator-wrapper">The &#64;verbosedecorator wrapper</a></li>
 </ul>

@@ -1,7 +1,8 @@
 import sys
 import warnings
+from statistics import mean
 from time import time, asctime, localtime
-from typing import Union
+from typing import Union, Optional
 
 from .counter import Counter
 
@@ -52,6 +53,8 @@ class ManagerMixins:
         self.buffer = None
         self.prev_message = "Initialising"
         self.progress = 0
+        self.iter_steps = {}
+        self.iterating = False
 
     def step(self, message: str):
         """
@@ -256,3 +259,49 @@ class VerboseManager(ManagerMixins):
         # this will print one step too early unless we buffer it and add
         # it after the current step completes
         self.buffer = ('|' * self.subprocesses + message, "")
+
+    def iterate(self, message: str, iteration_message: Optional[str] = None):
+        """Saves information on a step inside an iterator
+
+        Parameters
+        ----------
+        message: str
+            The overall message for this step. Used in final timings list.
+        iteration_message: str, optional
+            An optional message for this specific iteration, used in the progress bar.
+        """
+        if self.iterating == False:
+            self.iterating = True
+            self.prev_iter_step_time = time()
+            self.header("Entering iterator")
+            self.step("Iterator")
+
+        if self.step_times:
+            try:
+                self.iter_steps[message].append(time() - self.prev_iter_step_time)
+            except KeyError:  # if this iter step hasn't been run yet
+                self.iter_steps[message] = []
+
+            if self.bar:
+                if iteration_message:
+                    iteration_message = " " + iteration_message
+                else:
+                    iteration_message = ""
+                self._print_progress(self.progress, self.maximum, f'{message}{iteration_message}')
+
+            self.prev_iter_step_time = time()
+
+    def finish_iterate(self):
+        """Finishes an iterator and adds iterator steps to the step list"""
+        if self.step_times:
+            if len(self.iter_steps) == 0:
+                raise RuntimeError("finish_iterate() was run, but no iterator steps exist.")
+
+            for key in self.iter_steps:
+                iterations = len(self.iter_steps[key])
+                self.iter_steps[key] = mean(self.iter_steps[key])
+                self.timings_list.append((f"{'|' * (self.subprocesses + 1)}{key}",
+                                          f"Average {round(self.iter_steps[key], 2)} over {iterations + 1} iterations"))
+
+            self.iter_steps = {}
+            self.iterating = False

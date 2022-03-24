@@ -211,6 +211,54 @@ which would print like so:
    |Subprocess step 2: [time]
    Step 2: [time]
    
+Iterators
+---------
+VerboseManager supports iterators using the ``iterate("Iterator step")`` and ``finish_iterate()`` methods, letting you count a whole iterator as one step without the inside of the iterator being a black box.
+
+.. code:: python
+
+   def process():
+       # initialisation etc here
+       for x in list:
+           verbose_manager.iterate("Iterator step 1", iteration_message=f"for {x}")
+           # step 1 here
+           verbose_manager.iterate("Iterator step 2", iteration_message=f"for {x}")
+           # step 2 here
+       verbose_manager.finish_iterate()
+       verbose_manager.step("Normal step")
+       # etc...
+      
+Would print the following:
+
+.. code:: console
+
+   [===============] 100% Complete
+   Process completed in [time] seconds.
+   Timings per step:
+   Initialisation: [time]
+   Entering iterator:
+   |Iterator step 1: Average [time] over X iterations
+   |Iterator step 2: Average [time] over X iterations
+   Iterator: [time]
+   Normal step: [time]
+   
+And produce progress bars like:
+
+.. code:: console
+
+   [               ] 0% Initialising
+   [========       ] 50% Iterator
+   [========       ] 50% Iterator step 1 for list_item_1
+   [========       ] 50% Iterator step 2 for list_item_1
+   [========       ] 50% Iterator step 1 for list_item_2
+   [========       ] 50% Iterator step 2 for list_item_2
+   etc...
+   [===============] 100% Normal step
+   [===============] 100% Complete
+   
+counting the entire iterator as one step but still providing information.
+
+   
 Counting and debugging
 ----------------------
 For development, there is an optional parameter to ``VerboseManager.instance()``. If we set ``VerboseManager.instance(counter=True)``, instead of verbose management the manager object will debug the process. It will give an error if any ``start()`` is missing a corresponding ``finish()``, and at the end both print and return as a dictionary the number of steps and subprocesses in your process; this is very useful for calculating the ``n_steps`` parameter of your ``start()`` function.
