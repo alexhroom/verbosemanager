@@ -30,7 +30,6 @@ jobs:
     - name: pip install
       run: |
         pip3 install --upgrade pip
-        pip install -r requirements.txt
         pip install pylint pylint-exit
     - name: pylint
       run: |
