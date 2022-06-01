@@ -1,4 +1,5 @@
-from . import VerboseManager
+"""Module for the verbosedecorator decorator"""
+from .manager import VerboseManager
 
 
 def verbosedecorator(n_steps: int, counter=False):
@@ -11,8 +12,6 @@ def verbosedecorator(n_steps: int, counter=False):
     n_steps: int
         the number of verbose steps in your function (including those in subprocesses).
     counter: bool = False
-
-
     """
     def decorator(func):
         def wrapper(*args, **kwargs):

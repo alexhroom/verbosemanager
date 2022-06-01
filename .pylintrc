@@ -137,7 +137,9 @@ disable=print-statement,
         invalid-name,
         c-extension-no-member,
         unused-argument,
-        attribute-defined-outside-init
+        attribute-defined-outside-init,
+        too-many-instance-attributes,
+        duplicate-code
         
 
 # Enable the message, report, category or checker with the given id(s). You can
