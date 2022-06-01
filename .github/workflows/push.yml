@@ -46,4 +46,4 @@ jobs:
         pip install mypy
     - name: mypy
       run: |
-        mypy -p verbosemanager
+        mypy -p src/verbosemanager
