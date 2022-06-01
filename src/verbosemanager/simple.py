@@ -1,9 +1,8 @@
+"""Module for the simple verbose manager"""
 import sys
-import warnings
-from time import time, asctime, localtime
-from typing import Union
+from time import time
 
-from .verbosemanager import ManagerMixins
+from .manager import ManagerMixins
 
 
 def simpleverbose(n_subprocesses, counter=False):
@@ -16,7 +15,8 @@ def simpleverbose(n_subprocesses, counter=False):
     n_subprocesses: int
         the number of subprocesses in your function.
     counter: bool = False
-        If True, replaces the manager with a Counter object, which returns info on your process' verbose output.
+        If True, replaces the manager with a Counter object,
+        which returns info on your process' verbose output.
         Used for development.
     """
     def decorator(func):
@@ -27,7 +27,8 @@ def simpleverbose(n_subprocesses, counter=False):
                 verbose = 0
 
             simple_manager = SimpleManager.instance(counter=counter)
-            simple_manager.start(func.__name__.title(), n_subprocesses, verbose)
+            simple_manager.start(func.__name__.title(),
+                                 n_subprocesses, verbose)
             func(*args, **kwargs)
             simple_manager.finish(func.__name__.title())
 
@@ -38,7 +39,8 @@ def simpleverbose(n_subprocesses, counter=False):
 class SimpleManager(ManagerMixins):
     """
     SimpleManager is a simpler version of VerboseManager.
-    It has no 'step' function, just start and finish, and measures progress purely based on subprocesses.
+    It has no 'step' function, just start and finish,
+    and measures progress purely based on subprocesses.
     Designed to be used as part of @simpleverbose
     """
 
@@ -68,6 +70,8 @@ class SimpleManager(ManagerMixins):
         if verbose >= 3:
             self.bar = True
 
+        # pylint: disable=access-member-before-definition, no-member
+        # as these are implemented in the ManagerMixins class
         if not self._in_progress:
             # if not in progress, initialise process
             self._in_progress = True

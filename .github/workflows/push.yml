@@ -22,3 +22,29 @@ jobs:
     - name: Run pytest
       run: |
         python3 -m pytest
+
+  pylint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: pip install
+      run: |
+        pip3 install --upgrade pip
+        pip install pylint pylint-exit
+    - name: pylint
+      run: |
+        pylint src/verbosemanager/ || pylint-exit $? --error-fail --warn-fail --refactor-fail --convention-fail
+        exit $?
+
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: pip install
+      run: |
+        pip3 install --upgrade pip
+        pip install mypy
+    - name: mypy
+      run: |
+        cd ./src
+        mypy -p verbosemanager
