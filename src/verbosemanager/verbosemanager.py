@@ -15,7 +15,8 @@ class ManagerMixins:
     max_output_len = 20
 
     def __init__(self):
-        raise RuntimeError("VerboseManager should not be instantiated directly. Use VerboseManager.instance().")
+        raise RuntimeError(
+            "VerboseManager should not be instantiated directly. Use VerboseManager.instance().")
 
     @classmethod
     def instance(cls, counter=False):
@@ -71,7 +72,8 @@ class ManagerMixins:
         if self.step_times:
             message_time = time() - self.step_time
             # append previous step to timings list
-            self.timings_list.append((self.prev_message, round(message_time, 2)))
+            self.timings_list.append(
+                (self.prev_message, round(message_time, 2)))
             # if a header is buffered, add it now so it's in the right place
             if self.buffer is not None:
                 self.timings_list.append(self.buffer)
@@ -117,10 +119,12 @@ class ManagerMixins:
                 # the newline spaces are nice if the bar is there, but too spacious without it.
                 if self.bar:
                     sys.stdout.write('\n')
-                print(f"{process_name} complete in {round(timings - self.start_time, 2)} seconds.")
+                print(
+                    f"{process_name} complete in {round(timings - self.start_time, 2)} seconds.")
                 if self.step_times:
                     # append final step to timings list and then print timings per step
-                    self.timings_list.append((self.prev_message, round(time() - self.step_time, 2)))
+                    self.timings_list.append(
+                        (self.prev_message, round(time() - self.step_time, 2)))
                     self._print_step_timings(process_name)
 
                     # save timings list for return after we reset it
@@ -137,7 +141,8 @@ class ManagerMixins:
             self.subprocess_start_times.pop()
 
         else:
-            warnings.warn("VerboseManager.finish() was called, but no management process was running.")
+            warnings.warn(
+                "VerboseManager.finish() was called, but no management process was running.")
 
         return timings
 
@@ -150,7 +155,8 @@ class ManagerMixins:
         try:
             progress = i / maximum
         except ZeroDivisionError:
-            warnings.warn("Your function has zero verbose steps. Was this intentional?")
+            warnings.warn(
+                "Your function has zero verbose steps. Was this intentional?")
             return
 
         # calculate how much trailing whitespace is needed
@@ -170,7 +176,8 @@ class ManagerMixins:
         # we don't want this, we want to stay on the same line, so we can use \r to overwrite the bar.
         # \r is 'carriage return' - it returns to the start of line for overwriting.
         sys.stdout.write('\r')
-        sys.stdout.write(f"[{'=' * int(bar_size * progress):{bar_size}s}] {int(100 * progress)}%  {message} {eraser}")
+        sys.stdout.write(
+            f"[{'=' * int(bar_size * progress):{bar_size}s}] {int(100 * progress)}%  {message} {eraser}")
 
     @classmethod
     def _print_step_timings(cls, process_name):
@@ -187,7 +194,8 @@ class ManagerMixins:
                   " of output, set max output length with VerboseManager.max_output_len = [your desired length]")
             with open("timings.log", "a") as logfile:
                 # prints title line in case multiple timings are printed to same log
-                logfile.write(f"\nTimings for {process_name.lower()} on {asctime(localtime(time()))}\n")
+                logfile.write(
+                    f"\nTimings for {process_name.lower()} on {asctime(localtime(time()))}\n")
                 for step_timing in cls._instance.timings_list:
                     logfile.write(f"{step_timing[0]}: {step_timing[1]}\n")
         else:
@@ -278,7 +286,8 @@ class VerboseManager(ManagerMixins):
 
         if self.step_times:
             try:
-                self.iter_steps[message].append(time() - self.prev_iter_step_time)
+                self.iter_steps[message].append(
+                    time() - self.prev_iter_step_time)
             except KeyError:  # if this iter step hasn't been run yet
                 self.iter_steps[message] = []
 
@@ -287,7 +296,8 @@ class VerboseManager(ManagerMixins):
                     iteration_message = " " + iteration_message
                 else:
                     iteration_message = ""
-                self._print_progress(self.progress, self.maximum, f'{message}{iteration_message}')
+                self._print_progress(
+                    self.progress, self.maximum, f'{message}{iteration_message}')
 
             self.prev_iter_step_time = time()
 
@@ -295,7 +305,8 @@ class VerboseManager(ManagerMixins):
         """Finishes an iterator and adds iterator steps to the step list"""
         if self.step_times:
             if len(self.iter_steps) == 0:
-                raise RuntimeError("finish_iterate() was run, but no iterator steps exist.")
+                raise RuntimeError(
+                    "finish_iterate() was run, but no iterator steps exist.")
 
             for key in self.iter_steps:
                 iterations = len(self.iter_steps[key])

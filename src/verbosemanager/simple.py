@@ -27,7 +27,8 @@ def simpleverbose(n_subprocesses, counter=False):
                 verbose = 0
 
             simple_manager = SimpleManager.instance(counter=counter)
-            simple_manager.start(func.__name__.title(), n_subprocesses, verbose)
+            simple_manager.start(func.__name__.title(),
+                                 n_subprocesses, verbose)
             func(*args, **kwargs)
             simple_manager.finish(func.__name__.title())
 

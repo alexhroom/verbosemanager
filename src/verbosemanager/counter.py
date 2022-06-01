@@ -30,7 +30,8 @@ class Counter:
         self.subprocesses += 1
         self.in_process += 1
         if self.in_process > self.subprocesses + 1:
-            raise RuntimeError(f"Verbose processing on process {self.starts} is missing a finish() function.")
+            raise RuntimeError(
+                f"Verbose processing on process {self.starts} is missing a finish() function.")
         self.starts += 1
 
     def finish(self, ignored):
@@ -44,7 +45,8 @@ class Counter:
             self.subprocesses -= 1
             self.in_process -= 1
         else:
-            raise RuntimeError(f"Verbose processing on process {self.starts + 1} is missing a start() function.")
+            raise RuntimeError(
+                f"Verbose processing on process {self.starts + 1} is missing a start() function.")
 
     def step(self, ignored):
         """Counts how many steps are in the process."""
@@ -57,7 +59,8 @@ class Counter:
     def _print_results(self):
         """Prints final results when process finishes."""
 
-        print(f"Your process contains {self.starts - 1} subprocesses, and {self.steps} steps.")
+        print(
+            f"Your process contains {self.starts - 1} subprocesses, and {self.steps} steps.")
         results_dict = {"subprocesses": self.starts - 1,
                         "steps": self.steps}
         return results_dict
