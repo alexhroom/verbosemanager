@@ -6,7 +6,8 @@ from time import time, asctime, localtime
 from typing import Union, Optional
 
 from .counter import Counter
- # pylint: disable=attribute-defined-outside-init, disallowed-name
+
+# pylint: disable=attribute-defined-outside-init, disallowed-name
 
 
 class VerboseManager:
