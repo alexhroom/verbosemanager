@@ -2,7 +2,7 @@
 from .manager import VerboseManager
 
 
-def verbosedecorator(n_steps: int, counter=False):
+def verbosedecorator(n_steps: int, name: str = None, counter: bool = False):
     """
     A decorator that starts and finishes verbose processes on your behalf.
     The function that verbosedecorator is attached to must have 'verbose' entered as a **kwarg.
@@ -24,7 +24,7 @@ def verbosedecorator(n_steps: int, counter=False):
             verbose_manager = VerboseManager.instance(counter=counter)
             verbose_manager.start(n_steps, verbose)
             func(*args, **kwargs)
-            verbose_manager.finish(func.__name__.title())
+            verbose_manager.finish(name if name is not None else func.__name__.title())
 
         return wrapper
 
