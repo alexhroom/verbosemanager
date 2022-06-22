@@ -6,11 +6,13 @@ from time import time, asctime, localtime
 from typing import Union, Optional
 
 from .counter import Counter
+ # pylint: disable=attribute-defined-outside-init, disallowed-name
 
 
 class VerboseManager:
     """VerboseManager is a Singleton pattern class which manages verbose printing of a process."""
-    _instance: Union['VerboseManager', Counter, None] = None
+
+    _instance: Union["VerboseManager", Counter, None] = None
     # max_print_len decides how many lines of output are printed to stdout
     # before they are printed to file instead; this can be changed by user
     max_output_len = 20
@@ -47,7 +49,6 @@ class VerboseManager:
         """
         Sets variables to how they should be set when VerboseManager is instantiated
         """
-        #pylint: disable=attribute-defined-outside-init, disallowed-name
         self.times = False
         self.bar = False
         self.start_time = time()
@@ -97,7 +98,7 @@ class VerboseManager:
             if self.times:
                 self.start_time = time()
             if self.bar:
-                sys.stdout.write('\n')
+                sys.stdout.write("\n")
                 self._print_progress(0, self.maximum, "Initialising")
             if self.step_times:
                 self.step_time = self.start_time
@@ -149,7 +150,7 @@ class VerboseManager:
         # since a step isn't added to the timings list until it is finished,
         # this will print one step too early unless we buffer it and add
         # it after the current step completes
-        self.buffer = ('|' * self.subprocesses + message, "")
+        self.buffer = ("|" * self.subprocesses + message, "")
 
     def finish(self, process_name: str) -> Union[None, float, list]:
         """
@@ -215,7 +216,6 @@ class VerboseManager:
 
         return timings
 
-    
     def iterate(self, message: str, iteration_message: Optional[str] = None):
         """Saves information on a step inside an iterator
 
@@ -234,8 +234,7 @@ class VerboseManager:
 
         if self.step_times:
             try:
-                self.iter_steps[message].append(
-                    time() - self.prev_iter_step_time)
+                self.iter_steps[message].append(time() - self.prev_iter_step_time)
             except KeyError:  # if this iter step hasn't been run yet
                 self.iter_steps[message] = []
 
@@ -245,7 +244,8 @@ class VerboseManager:
                 else:
                     iteration_message = ""
                 self._print_progress(
-                    self.progress, self.maximum, f'{message}{iteration_message}')
+                    self.progress, self.maximum, f"{message}{iteration_message}"
+                )
 
             self.prev_iter_step_time = time()
 
@@ -254,14 +254,19 @@ class VerboseManager:
         if self.step_times:
             if len(self.iter_steps) == 0:
                 raise RuntimeError(
-                    "finish_iterate() was run, but no iterator steps exist.")
+                    "finish_iterate() was run, but no iterator steps exist."
+                )
 
             for key, times in self.iter_steps.items():
                 iterations = len(times)
                 self.iter_steps[key] = mean(times)
-                self.timings_list.append((f"{'|' * (self.subprocesses + 1)}{key}",
-                                          f"Average {round(self.iter_steps[key], 2)} "
-                                          f"over {iterations + 1} iterations"))
+                self.timings_list.append(
+                    (
+                        f"{'|' * (self.subprocesses + 1)}{key}",
+                        f"Average {round(self.iter_steps[key], 2)} "
+                        f"over {iterations + 1} iterations",
+                    )
+                )
 
             self.iter_steps = {}
             self.iterating = False
