@@ -60,6 +60,7 @@ def iterative_process():
 
     return _iterative_process
 
+
 def test_progress():
     """Tests that progress increases and decreases as intended with different methods"""
     vman = VerboseManager.instance()
@@ -76,15 +77,18 @@ def test_progress():
 
 
 @parametrize("verbose", [1, 2, 3])
-@parametrize("func, exp_stdout", [(process, 'process_stdout'),
-                                  (bigger_process, 'bigger_process_stdout')])
+@parametrize(
+    "func, exp_stdout",
+    [(process, "process_stdout"), (bigger_process, "bigger_process_stdout")],
+)
 def test_stdout(func, exp_stdout, capsys, verbose):
     func(verbose=verbose)
     stdout = capsys.readouterr().out
-    assert (EXP_STDOUT[f'{exp_stdout}'])[verbose] in stdout
+    assert (EXP_STDOUT[f"{exp_stdout}"])[verbose] in stdout
+
 
 @parametrize("verbose", [1, 2, 3])
 def test_iterate(iterative_process, capsys, verbose):
     iterative_process(verbose=verbose)
     stdout = capsys.readouterr().out
-    assert EXP_STDOUT['iterative_process_stdout'][verbose] in stdout
+    assert EXP_STDOUT["iterative_process_stdout"][verbose] in stdout

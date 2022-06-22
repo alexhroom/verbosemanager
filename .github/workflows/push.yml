@@ -23,18 +23,14 @@ jobs:
       run: |
         python3 -m pytest
 
-  pylint:
+  black:
+    name: Black formatting check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: pip install
-      run: |
-        pip3 install --upgrade pip
-        pip install pylint pylint-exit
-    - name: pylint
-      run: |
-        pylint src/verbosemanager/ || pylint-exit $? --error-fail --warn-fail --refactor-fail --convention-fail
-        exit $?
+    - uses: psf/black@stable
+      with:
+        options: "--check --verbose"
 
   mypy:
     runs-on: ubuntu-latest

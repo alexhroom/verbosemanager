@@ -45,12 +45,9 @@ def bigger_process(process):
 def test_counter(func):
     results = func(0)
 
-    process_dict = {'subprocesses': 0,
-                    'steps': 2}
-    bigger_dict = {'subprocesses': 1,
-                   'steps': 3}
+    process_dict = {"subprocesses": 0, "steps": 2}
+    bigger_dict = {"subprocesses": 1, "steps": 3}
 
-    exp_results_dict = {'_process': process_dict,
-                        '_bigger_process': bigger_dict}
+    exp_results_dict = {"_process": process_dict, "_bigger_process": bigger_dict}
 
     assert results == exp_results_dict[func.__name__]
