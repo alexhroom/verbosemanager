@@ -61,6 +61,7 @@ class VerboseManager:
         self.subprocess_start_times = []
         self.buffer = None
         self.prev_message = "Initialising"
+        self.eraser_len = 0
         self.progress = 0
         self.maximum = 0
         self.iter_steps = {}
@@ -284,27 +285,22 @@ class VerboseManager:
             warnings.warn("Your function has zero verbose steps. Was this intentional?")
             return
 
-        # calculate how much trailing whitespace is needed
-        # to avoid previous message being visible under new one
-        prev_message_len = len(self.prev_message)
-        if self.step_times:
-            # account for "; previous step took x.xx seconds." added
-            # and don't account for it at initialisation step
-            if self.progress != 0:
-                prev_message_len += 34
-        eraser_diff = prev_message_len - len(message)
-        eraser_diff = max(eraser_diff, 0)
-        eraser = f'{" " * eraser_diff}'
+        eraser = f'{" " * self.eraser_len}'
 
         # we use sys.stdout.write() instead of print()
         # because print() creates a new line at the end;
         # we don't want this, we want to stay on the same line,
         #  so we can use \r to overwrite the bar.
         # \r is 'carriage return' - it returns to the start of line for overwriting.
-        sys.stdout.write("\r")
+        sys.stdout.write(f"\r{eraser}\r")
         sys.stdout.write(
             f"[{'=' * int(bar_size * progress):{bar_size}s}] "
-            f"{int(100 * progress)}%  {message} {eraser}"
+            f"{int(100 * progress)}%  {message}"
+        )
+        # get length of eraser for next message
+        self.eraser_len = len(
+            f"[{'=' * int(bar_size * progress):{bar_size}s}] "
+            f"{int(100 * progress)}%  {message}"
         )
 
     @classmethod
