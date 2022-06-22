@@ -8,7 +8,8 @@ class Counter:
     To use, just change the parameter:
     verbose_manager = VerboseManager.instance(counter=True)
     """
-    _instance: Union['Counter', None] = None
+
+    _instance: Union["Counter", None] = None
 
     @classmethod
     def instance(cls):
@@ -40,7 +41,8 @@ class Counter:
         self.in_process += 1
         if self.in_process > self.subprocesses + 1:
             raise RuntimeError(
-                f"Verbose processing on process {self.starts} is missing a finish() function.")
+                f"Verbose processing on process {self.starts} is missing a finish() function."
+            )
         self.starts += 1
 
     def finish(self, ignored):
@@ -55,7 +57,8 @@ class Counter:
             self.in_process -= 1
             return None
         raise RuntimeError(
-            f"Verbose processing on process {self.starts + 1} is missing a start() function.")
+            f"Verbose processing on process {self.starts + 1} is missing a start() function."
+        )
 
     def step(self, ignored):
         """Counts how many steps are in the process."""
@@ -69,7 +72,7 @@ class Counter:
         """Prints final results when process finishes."""
 
         print(
-            f"Your process contains {self.starts - 1} subprocesses, and {self.steps} steps.")
-        results_dict = {"subprocesses": self.starts - 1,
-                        "steps": self.steps}
+            f"Your process contains {self.starts - 1} subprocesses, and {self.steps} steps."
+        )
+        results_dict = {"subprocesses": self.starts - 1, "steps": self.steps}
         return results_dict

@@ -17,7 +17,8 @@ class VerboseManager:
 
     def __init__(self):
         raise RuntimeError(
-            "VerboseManager should not be instantiated directly. Use VerboseManager.instance().")
+            "VerboseManager should not be instantiated directly. Use VerboseManager.instance()."
+        )
 
     @classmethod
     def instance(cls, counter=False):
@@ -46,6 +47,7 @@ class VerboseManager:
         """
         Sets variables to how they should be set when VerboseManager is instantiated
         """
+        #pylint: disable=attribute-defined-outside-init, disallowed-name
         self.times = False
         self.bar = False
         self.start_time = time()
@@ -119,8 +121,7 @@ class VerboseManager:
         if self.step_times:
             message_time = time() - self.step_time
             # append previous step to timings list
-            self.timings_list.append(
-                (self.prev_message, round(message_time, 2)))
+            self.timings_list.append((self.prev_message, round(message_time, 2)))
             # if a header is buffered, add it now so it's in the right place
             if self.buffer is not None:
                 self.timings_list.append(self.buffer)
@@ -171,23 +172,27 @@ class VerboseManager:
         if self._in_progress and self.subprocesses == 0:
             # give warning to developer if self.maximum is set incorrectly
             if self.progress != self.maximum:
-                warnings.warn(f"verbose steps for process \"{process_name}\" is set incorrectly: "
-                              f"it is equal to {self.maximum}, "
-                              f"but the process took {self.progress} steps.",
-                              stacklevel=2)
+                warnings.warn(
+                    f'verbose steps for process "{process_name}" is set incorrectly: '
+                    f"it is equal to {self.maximum}, "
+                    f"but the process took {self.progress} steps.",
+                    stacklevel=2,
+                )
 
             # print final results
             if self.times:
                 timings = time()
                 # the newline spaces are nice if the bar is there, but too spacious without it.
                 if self.bar:
-                    sys.stdout.write('\n')
+                    sys.stdout.write("\n")
                 print(
-                    f"{process_name} complete in {round(timings - self.start_time, 2)} seconds.")
+                    f"{process_name} complete in {round(timings - self.start_time, 2)} seconds."
+                )
                 if self.step_times:
                     # append final step to timings list and then print timings per step
                     self.timings_list.append(
-                        (self.prev_message, round(time() - self.step_time, 2)))
+                        (self.prev_message, round(time() - self.step_time, 2))
+                    )
                     self._print_step_timings(process_name)
 
                     # save timings list for return after we reset it
@@ -205,7 +210,8 @@ class VerboseManager:
 
         else:
             warnings.warn(
-                "VerboseManager.finish() was called, but no management process was running.")
+                "VerboseManager.finish() was called, but no management process was running."
+            )
 
         return timings
 
@@ -269,8 +275,7 @@ class VerboseManager:
         try:
             progress = i / maximum
         except ZeroDivisionError:
-            warnings.warn(
-                "Your function has zero verbose steps. Was this intentional?")
+            warnings.warn("Your function has zero verbose steps. Was this intentional?")
             return
 
         # calculate how much trailing whitespace is needed
@@ -290,10 +295,11 @@ class VerboseManager:
         # we don't want this, we want to stay on the same line,
         #  so we can use \r to overwrite the bar.
         # \r is 'carriage return' - it returns to the start of line for overwriting.
-        sys.stdout.write('\r')
+        sys.stdout.write("\r")
         sys.stdout.write(
             f"[{'=' * int(bar_size * progress):{bar_size}s}] "
-            f"{int(100 * progress)}%  {message} {eraser}")
+            f"{int(100 * progress)}%  {message} {eraser}"
+        )
 
     @classmethod
     def _print_step_timings(cls, process_name):
@@ -305,26 +311,20 @@ class VerboseManager:
         """
 
         if len(cls._instance.timings_list) > cls.max_output_len:
-            print("Timings list is too long, so has been printed to the file timings.log."
-                  " To change how many steps are recorded until we print to file instead"
-                  " of output, set max output length with"
-                  " VerboseManager.max_output_len = [your desired length]")
-            with open("timings.log", "a", encoding='utf-8') as logfile:
+            print(
+                "Timings list is too long, so has been printed to the file timings.log."
+                " To change how many steps are recorded until we print to file instead"
+                " of output, set max output length with"
+                " VerboseManager.max_output_len = [your desired length]"
+            )
+            with open("timings.log", "a", encoding="utf-8") as logfile:
                 # prints title line in case multiple timings are printed to same log
                 logfile.write(
-                    f"\nTimings for {process_name.lower()} on {asctime(localtime(time()))}\n")
+                    f"\nTimings for {process_name.lower()} on {asctime(localtime(time()))}\n"
+                )
                 for step_timing in cls._instance.timings_list:
                     logfile.write(f"{step_timing[0]}: {step_timing[1]}\n")
         else:
             print("Timings per step:")
             for step_timing in cls._instance.timings_list:
                 print(f"{step_timing[0]}: {step_timing[1]}")
-
-
-class VerboseManager(ManagerMixins):
-    """VerboseManager is a Singleton pattern class which manages verbose printing of a process."""
-    _instance = None
-    # max_print_len decides how many lines of output are printed to stdout
-    # before they are printed to file instead; this can be changed by user
-    max_output_len = 20
-
