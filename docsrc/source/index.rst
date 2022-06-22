@@ -25,7 +25,6 @@ Else, see the ‘about’ and ‘documentation’ headings below and in the side
    :caption: Documentation:
    
    doc/verbosemanager
-   doc/simpleverbose
    
 
 Quick start
