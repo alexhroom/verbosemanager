@@ -9,12 +9,12 @@ from tests.expected_values.stdout import EXP_STDOUT
 @parametrize("verbose", [1, 2, 3])
 @parametrize(
     "func, n_steps, exp_stdout",
-    [("process", 2, 'process_stdout'), ("bigger_process", 3, 'bigger_process_stdout')],
+    [("process", 2, "process_stdout"), ("bigger_process", 3, "bigger_process_stdout")],
 )
 def test_decorator(verbose, capsys, func, n_steps, exp_stdout):
     """Tests the verbosemanager decorator"""
 
-    @verbosedecorator(n_steps=2, name='Process')
+    @verbosedecorator(n_steps=2, name="Process")
     def process(**verbose):
         verbose_manager = VerboseManager.instance()
         sleep(0.01)
@@ -23,7 +23,7 @@ def test_decorator(verbose, capsys, func, n_steps, exp_stdout):
         verbose_manager.step("Process step 2")
         sleep(0.01)
 
-    @verbosedecorator(n_steps=3, name='Bigger process')
+    @verbosedecorator(n_steps=3, name="Bigger process")
     def bigger_process(**verbose):
         verbose_manager = VerboseManager.instance()
         sleep(0.01)
