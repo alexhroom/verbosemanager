@@ -8,8 +8,8 @@ from typing import Union, Optional
 from .counter import Counter
 
 
-class ManagerMixins:
-    """A mixin class for attributes shared by VerboseManager and SimpleManager"""
+class VerboseManager:
+    """VerboseManager is a Singleton pattern class which manages verbose printing of a process."""
     _instance: Union['VerboseManager', Counter, None] = None
     # max_print_len decides how many lines of output are printed to stdout
     # before they are printed to file instead; this can be changed by user
@@ -62,6 +62,48 @@ class ManagerMixins:
         self.iter_steps = {}
         self.iterating = False
 
+    def start(self, n_steps: int, verbose: int = 0):
+        """
+        Initialises progress management, including times and a progress bar.
+        If a progress bar is already running, accounts for the subprocess which called this.
+
+        Parameters
+        ----------
+        n_steps: int
+            The amount of steps involved in the process (including those in subprocesses).
+        verbose: int
+            The level of verbosity:
+            Verbose level 0 gives no information.
+            Verbose level 1 gives final time for a whole process.
+            Verbose level 2 gives final time and also a progress bar.
+            Verbose level 3 gives final time, a progress bar, and time per step.
+        """
+        # activate features based on verbosity level
+        if verbose >= 1:
+            self.times = True
+        if verbose >= 2:
+            self.step_times = True
+        if verbose >= 3:
+            self.bar = True
+
+        if not self._in_progress:
+            # if not in progress, initialise process
+            self._in_progress = True
+            self.progress = 0
+            self.maximum = n_steps
+
+            if self.times:
+                self.start_time = time()
+            if self.bar:
+                sys.stdout.write('\n')
+                self._print_progress(0, self.maximum, "Initialising")
+            if self.step_times:
+                self.step_time = self.start_time
+        else:
+            # else, a subprocess called this method; account for it
+            self.subprocesses += 1
+            self.subprocess_start_times.append(time())
+
     def step(self, message: str):
         """
         Increases progress by one 'step' towards maximum, updating progress bar if necessary.
@@ -92,6 +134,21 @@ class ManagerMixins:
         # if verbosity is 3, print progress bar
         if self.bar:
             self._print_progress(self.progress, self.maximum, message)
+
+    def header(self, message: str):
+        """
+        Adds a line to final step timings print without affecting step progress or advancement.
+
+        Parameters
+        ----------
+        message: str
+            The header message that will be printed.
+        """
+
+        # since a step isn't added to the timings list until it is finished,
+        # this will print one step too early unless we buffer it and add
+        # it after the current step completes
+        self.buffer = ('|' * self.subprocesses + message, "")
 
     def finish(self, process_name: str) -> Union[None, float, list]:
         """
@@ -151,6 +208,57 @@ class ManagerMixins:
                 "VerboseManager.finish() was called, but no management process was running.")
 
         return timings
+
+    
+    def iterate(self, message: str, iteration_message: Optional[str] = None):
+        """Saves information on a step inside an iterator
+
+        Parameters
+        ----------
+        message: str
+            The overall message for this step. Used in final timings list.
+        iteration_message: str, optional
+            An optional message for this specific iteration, used in the progress bar.
+        """
+        if self.iterating is False:
+            self.iterating = True
+            self.prev_iter_step_time = time()
+            self.header("Entering iterator")
+            self.step("Iterator")
+
+        if self.step_times:
+            try:
+                self.iter_steps[message].append(
+                    time() - self.prev_iter_step_time)
+            except KeyError:  # if this iter step hasn't been run yet
+                self.iter_steps[message] = []
+
+            if self.bar:
+                if iteration_message:
+                    iteration_message = " " + iteration_message
+                else:
+                    iteration_message = ""
+                self._print_progress(
+                    self.progress, self.maximum, f'{message}{iteration_message}')
+
+            self.prev_iter_step_time = time()
+
+    def finish_iterate(self):
+        """Finishes an iterator and adds iterator steps to the step list"""
+        if self.step_times:
+            if len(self.iter_steps) == 0:
+                raise RuntimeError(
+                    "finish_iterate() was run, but no iterator steps exist.")
+
+            for key, times in self.iter_steps.items():
+                iterations = len(times)
+                self.iter_steps[key] = mean(times)
+                self.timings_list.append((f"{'|' * (self.subprocesses + 1)}{key}",
+                                          f"Average {round(self.iter_steps[key], 2)} "
+                                          f"over {iterations + 1} iterations"))
+
+            self.iter_steps = {}
+            self.iterating = False
 
     def _print_progress(self, i, maximum, message):
         """
@@ -220,109 +328,3 @@ class VerboseManager(ManagerMixins):
     # before they are printed to file instead; this can be changed by user
     max_output_len = 20
 
-    def start(self, n_steps: int, verbose: int = 0):
-        """
-        Initialises progress management, including times and a progress bar.
-        If a progress bar is already running, accounts for the subprocess which called this.
-
-        Parameters
-        ----------
-        n_steps: int
-            The amount of steps involved in the process (including those in subprocesses).
-        verbose: int
-            The level of verbosity:
-            Verbose level 0 gives no information.
-            Verbose level 1 gives final time for a whole process.
-            Verbose level 2 gives final time and also a progress bar.
-            Verbose level 3 gives final time, a progress bar, and time per step.
-        """
-        # activate features based on verbosity level
-        if verbose >= 1:
-            self.times = True
-        if verbose >= 2:
-            self.step_times = True
-        if verbose >= 3:
-            self.bar = True
-
-        if not self._in_progress:
-            # if not in progress, initialise process
-            self._in_progress = True
-            self.progress = 0
-            self.maximum = n_steps
-
-            if self.times:
-                self.start_time = time()
-            if self.bar:
-                sys.stdout.write('\n')
-                self._print_progress(0, self.maximum, "Initialising")
-            if self.step_times:
-                self.step_time = self.start_time
-        else:
-            # else, a subprocess called this method; account for it
-            self.subprocesses += 1
-            self.subprocess_start_times.append(time())
-
-    def header(self, message: str):
-        """
-        Adds a line to final step timings print without affecting step progress or advancement.
-
-        Parameters
-        ----------
-        message: str
-            The header message that will be printed.
-        """
-
-        # since a step isn't added to the timings list until it is finished,
-        # this will print one step too early unless we buffer it and add
-        # it after the current step completes
-        self.buffer = ('|' * self.subprocesses + message, "")
-
-    def iterate(self, message: str, iteration_message: Optional[str] = None):
-        """Saves information on a step inside an iterator
-
-        Parameters
-        ----------
-        message: str
-            The overall message for this step. Used in final timings list.
-        iteration_message: str, optional
-            An optional message for this specific iteration, used in the progress bar.
-        """
-        if self.iterating is False:
-            self.iterating = True
-            self.prev_iter_step_time = time()
-            self.header("Entering iterator")
-            self.step("Iterator")
-
-        if self.step_times:
-            try:
-                self.iter_steps[message].append(
-                    time() - self.prev_iter_step_time)
-            except KeyError:  # if this iter step hasn't been run yet
-                self.iter_steps[message] = []
-
-            if self.bar:
-                if iteration_message:
-                    iteration_message = " " + iteration_message
-                else:
-                    iteration_message = ""
-                self._print_progress(
-                    self.progress, self.maximum, f'{message}{iteration_message}')
-
-            self.prev_iter_step_time = time()
-
-    def finish_iterate(self):
-        """Finishes an iterator and adds iterator steps to the step list"""
-        if self.step_times:
-            if len(self.iter_steps) == 0:
-                raise RuntimeError(
-                    "finish_iterate() was run, but no iterator steps exist.")
-
-            for key, times in self.iter_steps.items():
-                iterations = len(times)
-                self.iter_steps[key] = mean(times)
-                self.timings_list.append((f"{'|' * (self.subprocesses + 1)}{key}",
-                                          f"Average {round(self.iter_steps[key], 2)} "
-                                          f"over {iterations + 1} iterations"))
-
-            self.iter_steps = {}
-            self.iterating = False
