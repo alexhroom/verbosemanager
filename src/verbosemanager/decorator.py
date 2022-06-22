@@ -13,10 +13,11 @@ def verbosedecorator(n_steps: int, counter=False):
         the number of verbose steps in your function (including those in subprocesses).
     counter: bool = False
     """
+
     def decorator(func):
         def wrapper(*args, **kwargs):
             try:
-                verbose = kwargs['verbose']
+                verbose = kwargs["verbose"]
             except KeyError:
                 verbose = 0
 
@@ -26,4 +27,5 @@ def verbosedecorator(n_steps: int, counter=False):
             verbose_manager.finish(func.__name__.title())
 
         return wrapper
+
     return decorator
